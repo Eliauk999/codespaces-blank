@@ -30,20 +30,16 @@ int main(int argc,char* argv[]) {
     //     perror("truc err");
     // }
     int len = lseek(fd,0,SEEK_END); 
+    cout<<"len:"<<len<<endl;
     printf("%d\n",len);
     char* p = (char*) mmap(NULL,len,PROT_WRITE|PROT_READ,MAP_SHARED,fd,0);
     if(p == MAP_FAILED){
         perror("mmap err");
     }
+
     // 使用指针对文件进行操作
     strcpy(p,"hella");
-    // fd = open("SIGPIPE.cpp",O_RDWR);
-    lseek(fd,0,SEEK_SET);
-    char buf[100];
-    int n = read(fd,buf,100);
-    printf("n = %d\n",n);
-    printf("%s\n",buf);
-    printf("%s\n",p);
+    printf("mmap:%s\n",p+110);
     // 释放映射区
     munmap(p,len);
     
