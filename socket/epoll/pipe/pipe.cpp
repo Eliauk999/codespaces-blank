@@ -10,6 +10,8 @@
 #include<errno.h>
 using namespace std;
 
+// epoll监听进程间通讯的fd
+
 #define MAXLINE 10
 
 int main(){
@@ -23,6 +25,8 @@ int main(){
     pid = fork();
     // 子进程负责写
     if(pid ==0){
+        sleep(1);
+        cout<<"son"<<endl;
         // 关闭读端
         close(pfd[0]);
         // 不停写入数据
@@ -42,11 +46,14 @@ int main(){
             ch++;
             // 管道里是10个字节 aaaa\n bbbb\n
             write(pfd[1],buf,sizeof(buf));
+            cout<<"write:"<<buf<<endl;
             sleep(2);
         }
         close(pfd[1]);
     }
     else if(pid>0){
+        // sleep(1);
+        cout<<"father"<<endl;
         struct epoll_event event;
         struct epoll_event events[10];
         int res ,len;
@@ -54,12 +61,13 @@ int main(){
 
         // create epoll whit 10 notes
         epfd = epoll_create(10);
-        // event.events = EPOLLET; // ET边沿触发
+        // event.events = EPOLLIN| EPOLLET; // ET边沿触发
         event.events = EPOLLIN; // LT水平触发（默认）
         event.data.fd = pfd[0];
         epoll_ctl(epfd,EPOLL_CTL_ADD,pfd[0],&event);
 
         while(1){
+            cout<<"listen"<<endl;
             res = epoll_wait(epfd,events,10,-1);
             cout<<"res"<<res<<endl;
             if(events[0].data.fd == pfd[0]){
