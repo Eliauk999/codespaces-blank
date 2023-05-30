@@ -52,6 +52,7 @@ void* producer(void*){
         t->next =head;
         head = t;
         pthread_mutex_unlock(&lock);
+        
         pthread_cond_signal(&has_product);
         sleep(rand()%2);
     }
